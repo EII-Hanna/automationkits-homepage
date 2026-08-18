@@ -11,10 +11,7 @@ async function getAuthedClient() {
 }
 
 function revalidateOperations() {
-  revalidatePath("/internal");
-  revalidatePath("/internal/customers");
-  revalidatePath("/internal/onboarding");
-  revalidatePath("/internal/delivery");
+  ["/internal","/internal/customers","/internal/onboarding","/internal/delivery","/internal/tasks","/internal/blockers","/internal/results","/internal/support","/internal/activity","/internal/billing","/portal"].forEach(revalidatePath);
 }
 
 export async function setTaskStatus(formData: FormData) {
@@ -22,6 +19,21 @@ export async function setTaskStatus(formData: FormData) {
   const taskId = String(formData.get("task_id"));
   const status = String(formData.get("status"));
   const { error } = await supabase.rpc("set_task_status", { p_task_id: taskId, p_status: status });
+  if (error) throw error;
+  revalidateOperations();
+}
+
+export async function createTask(formData: FormData) {
+  const supabase = await getAuthedClient();
+  const due = String(formData.get("due_date") || "");
+  const phase = String(formData.get("phase_id") || "");
+  const { error } = await supabase.rpc("create_customer_task", {
+    p_customer_id: String(formData.get("customer_id")),
+    p_title: String(formData.get("title") || ""),
+    p_owner: String(formData.get("owner") || ""),
+    p_due_date: due || null,
+    p_phase_id: phase || null
+  });
   if (error) throw error;
   revalidateOperations();
 }
@@ -64,5 +76,50 @@ export async function completeOnboarding(formData: FormData) {
   if (error) throw error;
   revalidateOperations();
   revalidatePath(`/internal/customers/${customerId}`);
-  revalidatePath("/portal");
+}
+
+export async function createBlocker(formData: FormData) {
+  const supabase = await getAuthedClient();
+  const taskId = String(formData.get("task_id") || "");
+  const { error } = await supabase.rpc("create_customer_blocker", {
+    p_customer_id: String(formData.get("customer_id")),
+    p_description: String(formData.get("description") || ""),
+    p_task_id: taskId || null
+  });
+  if (error) throw error;
+  revalidateOperations();
+}
+
+export async function setBlockerStatus(formData: FormData) {
+  const supabase = await getAuthedClient();
+  const { error } = await supabase.rpc("set_blocker_status", {
+    p_blocker_id: String(formData.get("blocker_id")),
+    p_status: String(formData.get("status"))
+  });
+  if (error) throw error;
+  revalidateOperations();
+}
+
+export async function createResult(formData: FormData) {
+  const supabase = await getAuthedClient();
+  const { error } = await supabase.rpc("create_customer_result", {
+    p_customer_id: String(formData.get("customer_id")),
+    p_metric_name: String(formData.get("metric_name") || "Outcome"),
+    p_ausgangszustand: String(formData.get("ausgangszustand") || ""),
+    p_zielzustand: String(formData.get("zielzustand") || ""),
+    p_aktueller_zustand: String(formData.get("aktueller_zustand") || ""),
+    p_verifiziertes_ergebnis: String(formData.get("verifiziertes_ergebnis") || "")
+  });
+  if (error) throw error;
+  revalidateOperations();
+}
+
+export async function setSupportTicketStatus(formData: FormData) {
+  const supabase = await getAuthedClient();
+  const { error } = await supabase.rpc("set_support_ticket_status", {
+    p_ticket_id: String(formData.get("ticket_id")),
+    p_status: String(formData.get("status"))
+  });
+  if (error) throw error;
+  revalidateOperations();
 }

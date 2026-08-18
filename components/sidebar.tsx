@@ -28,13 +28,13 @@ export function Sidebar() {
         <div className="group">OPERATIONS</div>
         <Link href="/internal/onboarding"><Icon name="onboarding"/>Onboarding</Link>
         <Link href="/internal/delivery"><Icon name="delivery"/>Delivery</Link>
-        <Link href="/internal#tasks"><Icon name="tasks"/>Tasks</Link>
-        <Link href="/internal#blockers"><Icon name="blockers"/>Blockers</Link>
-        <Link href="/internal#results"><Icon name="results"/>Results</Link>
-        <Link href="/internal#support"><Icon name="support"/>Support</Link>
-        <Link href="/internal#activity"><Icon name="activity"/>Activity</Link>
+        <Link href="/internal/tasks"><Icon name="tasks"/>Tasks</Link>
+        <Link href="/internal/blockers"><Icon name="blockers"/>Blockers</Link>
+        <Link href="/internal/results"><Icon name="results"/>Results</Link>
+        <Link href="/internal/support"><Icon name="support"/>Support</Link>
+        <Link href="/internal/activity"><Icon name="activity"/>Activity</Link>
         <div className="group">PLATFORM</div>
-        <Link href="/internal#billing"><Icon name="billing"/>Billing</Link>
+        <Link href="/internal/billing"><Icon name="billing"/>Billing</Link>
         <Link href="/portal"><Icon name="portal"/>Kundenportal</Link>
       </nav>
       <div className="user">Production V1 · Next.js</div>

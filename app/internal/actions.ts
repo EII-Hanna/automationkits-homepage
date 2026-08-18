@@ -10,46 +10,45 @@ async function getAuthedClient() {
   return supabase;
 }
 
+function revalidateOperations() {
+  revalidatePath("/internal");
+  revalidatePath("/internal/customers");
+  revalidatePath("/internal/onboarding");
+  revalidatePath("/internal/delivery");
+}
+
 export async function setTaskStatus(formData: FormData) {
   const supabase = await getAuthedClient();
   const taskId = String(formData.get("task_id"));
   const status = String(formData.get("status"));
-  const { error } = await supabase.rpc("set_task_status", {
-    p_task_id: taskId,
-    p_status: status
-  });
+  const { error } = await supabase.rpc("set_task_status", { p_task_id: taskId, p_status: status });
   if (error) throw error;
-  revalidatePath("/internal");
+  revalidateOperations();
 }
 
 export async function setRoadmapStatus(formData: FormData) {
   const supabase = await getAuthedClient();
   const phaseId = String(formData.get("phase_id"));
   const status = String(formData.get("status"));
-  const { error } = await supabase.rpc("set_roadmap_status", {
-    p_phase_id: phaseId,
-    p_status: status
-  });
+  const { error } = await supabase.rpc("set_roadmap_status", { p_phase_id: phaseId, p_status: status });
   if (error) throw error;
-  revalidatePath("/internal");
+  revalidateOperations();
 }
 
 export async function setPortalStatus(formData: FormData) {
   const supabase = await getAuthedClient();
   const customerId = String(formData.get("customer_id"));
   const status = String(formData.get("status"));
-  const { error } = await supabase.rpc("set_portal_status", {
-    p_customer_id: customerId,
-    p_status: status
-  });
+  const { error } = await supabase.rpc("set_portal_status", { p_customer_id: customerId, p_status: status });
   if (error) throw error;
-  revalidatePath("/internal");
+  revalidateOperations();
 }
 
 export async function completeOnboarding(formData: FormData) {
   const supabase = await getAuthedClient();
+  const customerId = String(formData.get("customer_id"));
   const args = {
-    p_customer_id: String(formData.get("customer_id")),
+    p_customer_id: customerId,
     p_company_name: String(formData.get("company_name") || ""),
     p_contact_name: String(formData.get("contact_name") || ""),
     p_phone: String(formData.get("phone") || ""),
@@ -63,5 +62,7 @@ export async function completeOnboarding(formData: FormData) {
   };
   const { error } = await supabase.rpc("complete_customer_onboarding", args);
   if (error) throw error;
-  revalidatePath("/internal");
+  revalidateOperations();
+  revalidatePath(`/internal/customers/${customerId}`);
+  revalidatePath("/portal");
 }
